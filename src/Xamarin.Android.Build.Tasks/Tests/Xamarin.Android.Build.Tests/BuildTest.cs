@@ -137,7 +137,6 @@ namespace Xamarin.Android.Build.Tests
 				// Disable fast deployment for aabs, because we give:
 				//	XA0119: Using Fast Deployment and Android App Bundles at the same time is not recommended.
 				proj.EmbedAssembliesIntoApk = true;
-				proj.AndroidUseSharedRuntime = false;
 			}
 			proj.SetProperty ("XamarinAndroidSupportSkipVerifyVersions", "True"); // Disables API 29 warning in Xamarin.Build.Download
 			proj.SetProperty ("AndroidPackageFormat", packageFormat);
@@ -743,7 +742,7 @@ namespace UnamedProject
 			proj.SetProperty ("AndroidPackageFormat", packageFormat);
 			if (packageFormat == "aab")
 				// Disable the shared runtime for aabs because it is not currently compatible and so gives an XA0119 build error.
-				proj.AndroidUseSharedRuntime = false;
+				proj.EmbedAssembliesIntoApk = true;
 			using (var b = CreateApkBuilder ()) {
 				Assert.IsTrue (b.Build (proj), "Build should have succeeded.");
 				Assert.IsTrue (b.Clean (proj), "Clean should have succeeded.");
@@ -973,6 +972,7 @@ namespace UnamedProject
 		[Test]
 		[TestCaseSource (nameof (AotChecks))]
 		[Category ("SmokeTests")]
+		[NonParallelizable]
 		public void BuildAotApplicationAndÜmläüts (string supportedAbis, bool enableLLVM, bool expectedResult)
 		{
 			var path = Path.Combine ("temp", string.Format ("BuildAotApplication AndÜmläüts_{0}_{1}_{2}", supportedAbis, enableLLVM, expectedResult));
@@ -2582,6 +2582,7 @@ public class Test
 
 		[Test]
 		[Category ("SmokeTests"), Category ("dotnet")]
+		[NonParallelizable]
 		public void BuildApplicationWithSpacesInPath ([Values (true, false)] bool enableMultiDex, [Values ("dx", "d8")] string dexTool, [Values ("", "proguard", "r8")] string linkTool)
 		{
 			AssertDexToolSupported (dexTool);
@@ -2862,7 +2863,6 @@ AAMMAAABzYW1wbGUvSGVsbG8uY2xhc3NQSwUGAAAAAAMAAwC9AAAA1gEAAAAA") });
 		{
 			var proj = new XamarinAndroidApplicationProject {
 				EmbedAssembliesIntoApk = true,
-				AndroidUseSharedRuntime = false,
 			};
 			proj.SetProperty (proj.ActiveConfigurationProperties, "DebugType", "portable");
 			using (var b = CreateApkBuilder ("temp/BuildBasicApplicationCheckPdb", false, false)) {
@@ -3426,7 +3426,6 @@ AAMMAAABzYW1wbGUvSGVsbG8uY2xhc3NQSwUGAAAAAAMAAwC9AAAA1gEAAAAA") });
 </Project>
 ",
 			});
-			app1.SetProperty(KnownProperties.AndroidUseSharedRuntime, "False");
 			sb.Projects.Add(app1);
 			var code = new StringBuilder();
 			code.AppendLine("using System;");
@@ -3760,7 +3759,6 @@ AAAAAAAAAAAAPQAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAhQAFAAICAgAJZFnS7uHtAn+AQAA
 		{
 			var proj = new XamarinAndroidApplicationProject ();
 			proj.SetProperty ("_XASupportsFastDev", "True");
-			proj.SetProperty (KnownProperties.AndroidUseSharedRuntime, "True");
 			proj.SetProperty (proj.DebugProperties, "AndroidLinkMode", "Full");
 			using (var b = CreateApkBuilder (Path.Combine ("temp", TestName))) {
 				b.Target = "Build"; // SignAndroidPackage would fail for OSS builds
@@ -3775,7 +3773,6 @@ AAAAAAAAAAAAPQAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAhQAFAAICAgAJZFnS7uHtAn+AQAA
 		{
 			var proj = new XamarinAndroidApplicationProject ();
 			proj.SetProperty ("_XASupportsFastDev", "True");
-			proj.SetProperty (KnownProperties.AndroidUseSharedRuntime, "True");
 			proj.SetProperty ("AndroidPackageFormat", "aab");
 			using (var builder = CreateApkBuilder ()) {
 				builder.ThrowOnBuildFailure = false;
@@ -3791,7 +3788,6 @@ AAAAAAAAAAAAPQAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAhQAFAAICAgAJZFnS7uHtAn+AQAA
 		public void FastDeploymentDoesNotAddContentProvider ()
 		{
 			var proj = new XamarinAndroidApplicationProject {
-				AndroidUseSharedRuntime = true,
 				EmbedAssembliesIntoApk = false,
 			};
 			proj.SetProperty ("_XASupportsFastDev", "True");
@@ -4229,7 +4225,7 @@ namespace UnnamedProject
 			proj.SetProperty ("AndroidPackageFormat", packageFormat);
 			if (packageFormat == "aab")
 				// Disable the shared runtime for aabs because it is not currently compatible and so gives an XA0119 build error.
-				proj.AndroidUseSharedRuntime = false;
+				proj.EmbedAssembliesIntoApk = true;
 			proj.OtherBuildItems.Add (new BuildItem ("AndroidJavaLibrary", "kotlinx-coroutines-android-1.3.2.jar") {
 				WebContent = "https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-android/1.3.2/kotlinx-coroutines-android-1.3.2.jar"
 			});
